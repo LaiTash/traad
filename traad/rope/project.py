@@ -46,11 +46,12 @@ class Change:
     to the refactoring, the resources, etc. You can direcly call
     perform() on this object to run the refactoring.
     """
-    def __init__(self, refactoring, *args):
+    def __init__(self, refactoring, *args, **kwargs):
         self.refactoring = refactoring
         self.args = args
+        self.kwargs = kwargs
 
-        self.changes = self.refactoring.get_all_changes(*args)
+        self.changes = self.refactoring.get_all_changes(*args, **kwargs)
         self._performed = False
 
     @property
@@ -84,10 +85,12 @@ class MultiProjectRefactoring:
         cross_ref = multiproject.MultiProjectRefactoring(
             refactoring_type,
             list(project.cross_projects.values()))
+        self.options = project.change_options
         self.rope_ref = cross_ref(project.proj, *args)
+        self.change_options = project.change_options
 
     def get_change(self, *args):
-        return Change(self.rope_ref, *args)
+        return Change(self.rope_ref, *args, **self.change_options)
 
 
 class Project(ChangeSignatureMixin,
@@ -104,12 +107,13 @@ class Project(ChangeSignatureMixin,
         super(Project, self).__init__()
 
         self.proj = rope.base.project.Project(project_dir)
-
+        self.change_options = {}
         self.cross_projects = dict()
 
         cross_dirs = set(cross_project_dirs)
         cross_dirs.discard(project_dir)
         emap(self.add_cross_project, cross_dirs)
+
 
     def close(self):
         self.proj.close()

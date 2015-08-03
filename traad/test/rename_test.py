@@ -26,5 +26,18 @@ class Tests(with_fixture.TestCase):
             'main',
             'basic')
 
+    def test_with_kwargs(self):
+        self.proj.change_options = {'docs': True}
+        self.proj.rename(
+            self.task_state,
+            'Llama',
+            'basic/foo.py',
+            8).get()
+
+        common.compare_projects(
+            'basic_rename_llama',
+            'main',
+            'basic')
+
 if __name__ == '__main__':
     unittest.main()

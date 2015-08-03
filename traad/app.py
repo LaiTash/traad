@@ -73,6 +73,11 @@ def full_task_status():
     log.info('full status: {}'.format(status))
     return status
 
+@app.post('/set_options')
+def set_change_options():
+    args = bottle.request.json
+    bottle.request.app.project.change_options = args
+    return {'result': 'success'}
 
 @app.post('/history/undo')
 def undo_view():
